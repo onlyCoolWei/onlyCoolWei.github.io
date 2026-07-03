@@ -765,12 +765,14 @@ export async function handleSync(argv) {
 
   await stashContentFolder(contentFolder)
 
+  const currentBranch = execSync("git rev-parse --abbrev-ref HEAD").toString().trim()
+
   if (argv.pull) {
     console.log(
       "Pulling updates from your repository. You may need to resolve some `git` conflicts if you've made changes to components or plugins.",
     )
     try {
-      gitPull(ORIGIN_NAME, QUARTZ_SOURCE_BRANCH)
+      gitPull(ORIGIN_NAME, currentBranch)
     } catch {
       console.log(
         styleText("red", "An error occurred while pulling updates from your repository.") +
@@ -784,7 +786,6 @@ export async function handleSync(argv) {
   await popContentFolder(contentFolder)
   if (argv.push) {
     console.log("Pushing your changes")
-    const currentBranch = execSync("git rev-parse --abbrev-ref HEAD").toString().trim()
     const res = spawnSync("git", ["push", "-uf", ORIGIN_NAME, currentBranch], {
       stdio: "inherit",
     })
